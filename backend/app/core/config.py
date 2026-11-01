@@ -1,11 +1,18 @@
+from pathlib import Path
 from typing import List, Optional
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+_BACKEND_DIR = Path(__file__).resolve().parent.parent.parent
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=(
+            str(_BACKEND_DIR / ".env"),
+            ".env",
+            "backend/.env",
+        ),
         env_file_encoding="utf-8",
         case_sensitive=True,
         extra="ignore",
@@ -58,6 +65,13 @@ class Settings(BaseSettings):
     RATE_LIMIT_AUTH_PER_MIN: int = 120
     RATE_LIMIT_BULK_PER_MIN: int = 30
     RATE_LIMIT_GENERAL_PER_MIN: int = 120
+
+    # Jules Bug Automation
+    JULES_API_KEY: Optional[str] = None
+    JULES_REPO: str = "vaseemdane/sms"
+    JULES_BRANCH: str = "main"
+    JULES_API_URL: str = "https://jules.googleapis.com/v1alpha/sessions"
+
 
     @model_validator(mode="after")
     def validate_production_secrets(self):
